@@ -1,0 +1,139 @@
+________React Context API________
+1.INTRODUCTION
+
+When we using ?
+Application Context API for building blogManagement ( advanced state management )
+Props: 
+-> Communicates information from a parent directly down to a child
+-> Easy to setup ( parents down to child as Props)
+-> To communicate data down mutiple layers, we have to write a lot of code
+
+Context: 
+-> Moves information from a parent to some nested child
+-> Complicated to setup, lots of special terms
+-> Easy to commnuicate data from a parent to a super nested child
+
+=> In this application I'll use contextAPI.
+
+Why ? -> Render directly from Blog Post Provider => Blog List in Component Index Screen.
+So Context API : what's this?
+-> We can use Context API everywhere : subject,navigation,graphql ... (Big Update )
+* Important : <Provider> && <Consumer> same as Redux 
+* Example : 
+// Create Context
+const contextTerm= React.createContext();
+// Background include 2 Components
+const {Provider, Consumer} = contextTerm;
+// Render Provider send 1 argument
+const infoPeople={
+  firstName: 'Gia Vu',
+  last Name: 'Dang Le'
+}
+<Provider value={infoPeople}><App/></Provider>
+
+* Now,everywhere in App Component we can use infoPeople ( from Provider sent )
+<Consumer>{({firstName,lastName})} => <span>{`${firstName} ${lastName}`}</span>}</Consumer>
+
+2.IMPLEMENTATION
+With ContextAPI above , now we have Store -> View ( Dispatcher -> Store -> View -> Action )
+Now we need Dispatcher and Action for auto update store.
+So, what's happens when Dynamic Store is a state of root Components. 
+(Example Below) 
+
+import React, { Component }  from 'react'
+
+class EnhancedProvider extends Component {
+  state = {
+    count: 0
+  }
+
+  render() {
+    return (
+      <Provider
+        value={{
+          state: this.state
+          actions: {
+            increment: () => this.setState({ count: this.state.count + 1 }),
+          }
+        }}
+      >
+        {this.props.children}
+      </Provider>
+    )
+  }
+}
+
+We accept state and action same as value of Provider . Now we can use them with <Consumer/>
+(Example Below)
+
+import React from 'react'
+
+const Display = () => (
+  <Consumer>
+    {({ state, actions }) => (
+      <Fragment>
+        <span>{state.count}</span>
+        <button onClick={actions.increment}>+</button>
+      </Fragment>
+    )}
+  </Consumer>
+)
+
+3. REACT-WATERFALL
+We just initStore from react-waterfall , set initial state and implenment some actions:
+(state,...args) -> stateChunk Store has been created somethings like : 
+- Provider and Consumer : explained
+- actions : explained
+- getState() : get State at this time.
+- connect() : maping state and actions to props of component
+ex: let User = connect (['users'])(User)
+- subscribe() : Read Changed State ( console.log ) 
+ex: subscribe((action,state) => console.log(action,state));
+
+
+4. COMPARE TO REDUX
+* Stronger :
+- Easy to implement.
+- Size and Performance
+- Return action cleaner than state chunk ( in setState)
+* Weaker :
+- Can only use with React 16.3 or higher :)))
+
+____________END________________
+
+
+II . In application blogManagement
+<BlogContext.Provider value={{data:blogPosts,addBlogPost}}>
+      {children}
+    </BlogContext.Provider>
+-> Everything we add in value can use data(object include data), addBlogPost (function to add new blog);
+
+
+
+* Refactor useState to useReducer
+1. We have to create a separate function for each operation we'd want to take on a blog.Many functions!
+-> Rather than the 'useState' hook, maybe try out 'useReducer' instead
+
+* Essentially of useReducer 
+We must create a use Reducer same as :
+const [blogPosts, dispatch] = useReducer(blogReducer,[]); 
+-blogPosts is what output we want to return
+-dispath is type of action what we want to invoke.
+-blogReducer is type of action we want to use, [] initialize value.
+Ex : 
+const blogReducer = (state,action) => {
+  switch(action.type){
+    case 'add_blogpost':
+      return [...state,{title:`Blog Post # ${state.length + 1}`}];
+    default :
+      return state;
+  }
+}; // blogReducer receive 2 args state and action 
+// State is what state we want update , Action is what method we want to use 
+
+
+
+
+
+
+
