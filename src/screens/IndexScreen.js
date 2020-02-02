@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext ,useEffect } from 'react';
 import { View, StyleSheet, Text, FlatList, Button, TouchableOpacity } from 'react-native';
 import { Context as BlogContext } from '../context/BlogContext'; // Import a constant from a component must not have {}
 
@@ -7,7 +7,15 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 
 const IndexScreen = ({ navigation }) => {
-  const { state, deleteBlogPost } = useContext(BlogContext);
+  const { state, deleteBlogPost ,getBlogPosts } = useContext(BlogContext);
+
+  useEffect(()=>{
+    getBlogPosts();
+    const listener = navigation.addListener('didFocus',()=>{
+      getBlogPosts();
+    });
+  },[]);
+  
 
   return (
     <View>
